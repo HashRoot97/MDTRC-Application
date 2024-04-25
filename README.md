@@ -71,7 +71,18 @@ If the Journal doesn't open, go to "Display" -> "Show" -> "Journal"
 
 15. The contents of both the files is shown below - 
 
-Capture 
+<img src="./samples/Capture32.png">
+<img src="./samples/Capture33.png"> 
+
+If the header of the text file does not match, replace the following header - 
+
+EDA_Events.acq
+0.5 msec/sample
+2 channels
+PPG, X, PPGED-R
+Volts
+EDA, Y, PPGED-R
+microsiemens
 
 16. Place both the text and xls files in one folder, preferably inside the python application folder named "data".
 
