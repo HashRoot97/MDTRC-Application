@@ -14,57 +14,58 @@ Requirements -
 1. If you have already recorded the data, and saved it into the .acq file, Open the file by going to "Open a graph file" -> "Graph file on Disk" and then click Ok and browse the .acq file on the system. 
 We will be using "EDA_Events.acq" file for our understanding.
 
-[<img src="./samples/Capture1.PNG">]
+[<img src="./samples/Capture4.PNG">]
 
 2. After opening the file, the graph for the EDA would be displayed as shown below.
 
-Capture 5
+[<img src="./samples/Capture5.PNG">]
 
 3. You would need two files to run your analysis on the python application which would be generated through Acknowledge 5.0 software - A txt file containing raw dump and .xls file containing the event markers data
 
 4. To generate the txt file, Go to "File" -> "Save As". A dialog box will appear to browse the save location. In the "Save As Type" section select "Text (*.txt, *.csv)". Name the file same as the .acq file, in our case "sample.txt"
 
-Capture 6,7
+[<img src="./samples/Capture6.png">]
+[<img src="./samples/Capture7.png">]
 
 5. When you click Save, a dialog box will appear named "Write text file options". Use the following write options.
 
-Capture 8
+[<img src="./samples/Capture8.PNG">]
 
 6. To generate the .xls file for events, go to "Display" -> "Show" -> "Event Pallette". A dialog box named "Events" would appear.
 
-Capture 9
+[<img src="./samples/Capture9.png">]
 
 7.  Click on "Summarize in Journal".
 
-Capture 10
+[<img src="./samples/Capture10.png">]
 
 8. A new message would appear titled "No Journal is Open", click on "Yes" to continue. If this doesn't appear an event journal is already opened. 
 
-Capture 27
+[<img src="./samples/Capture27.PNG">]
 
 9. A new dialog box will open named "Event Journal Summary". Use the setting as highlighted below and click "Ok".
 
-Capture 11
+[<img src="./samples/Capture11.PNG">]
 
 10. This would open a journal at the bottom as shown containing a list of events.
 
-Capture 29
+[<img src="./samples/Capture29.PNG">]
 
 If the Journal doesn't open, go to "Display" -> "Show" -> "Journal"
 
-Capture 12
+[<img src="./samples/Capture12.png">]
 
 12. On the Journal dialog at the bottom, click on the "Save" button which would open the File browser. 
 
-Capture 13
+[<img src="./samples/Capture13.PNG">]
 
 13. While saving select the "Excel Spreadsheet (.xls)" in "Save as type" and name the file same as the text file, "sample.xls" in our case. Click on "Save"
 
-Capture 14
+[<img src="./samples/Capture14.png">]
 
 14. Now you would have the two generated files named "sample.txt" and "sample.xls"
 
-Capture 15
+[<img src="./samples/Capture15.PNG">]
 
 15. The contents of both the files is shown below - 
 
