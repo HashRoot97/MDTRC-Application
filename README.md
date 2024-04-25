@@ -14,7 +14,7 @@ Requirements -
 1. If you have already recorded the data, and saved it into the .acq file, Open the file by going to "Open a graph file" -> "Graph file on Disk" and then click Ok and browse the .acq file on the system. 
 We will be using "EDA_Events.acq" file for our understanding.
 
-Capture 4
+[<img src="./samples/windows_console.png">]
 
 2. After opening the file, the graph for the EDA would be displayed as shown below.
 
