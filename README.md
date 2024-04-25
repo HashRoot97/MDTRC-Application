@@ -99,7 +99,8 @@ microsiemens
 2. Activate the python package installer pip, if not done already.
 
 3. Open the terminal and execute the following command to install the required python packages - 
-  pip install matplotlib tk numpy scipy pandas customtkinter
+  
+    pip install matplotlib tk numpy scipy pandas customtkinter xlrd
 
 4. In the terminal, go to the folder where the code is kept.
 
