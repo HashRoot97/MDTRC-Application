@@ -2,7 +2,7 @@
 
 A tool to analyse the EDA data captured using BIOPAC and Acknowledge 5.0 with the various events using various visualizations.
 
-<img src="./samples/Sample_main.png">
+<img src="./samples/Sample_main2.png">
 
 ## Requirements - 
   Window 11 
