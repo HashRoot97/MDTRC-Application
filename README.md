@@ -2,14 +2,16 @@
 
 A tool to analyse the EDA data captured using BIOPAC and Acknowledge 5.0 with the various events using various visualizations.
 
-Requirements - 
+[<img src="./samples/Sample_main.png">]
+
+## Requirements - 
   Window 11 
   Python 3.11.9
   BIOPAC
   Acknowledge 5.0
 
 
-# On the Acknowledge 5.0 - 
+## On the Acknowledge 5.0 - 
 
 1. If you have already recorded the data, and saved it into the .acq file, Open the file by going to "Open a graph file" -> "Graph file on Disk" and then click Ok and browse the .acq file on the system. 
 We will be using "EDA_Events.acq" file for our understanding.
@@ -22,7 +24,7 @@ We will be using "EDA_Events.acq" file for our understanding.
 
 3. You would need two files to run your analysis on the python application which would be generated through Acknowledge 5.0 software - A txt file containing raw dump and .xls file containing the event markers data
 
-4. To generate the txt file, Go to "File" -> "Save As". A dialog box will appear to browse the save location. In the "Save As Type" section select "Text (*.txt, *.csv)". Name the file same as the .acq file, in our case "sample.txt"
+4. To generate the txt file, Go to "File" -> "Save As". A dialog box will appear to browse the save location. In the "Save As Type" section select "Text (*.txt, *.csv)". Name the file same as the .acq file, in our case "EDA_Events.txt"
 
 [<img src="./samples/Capture6.png">]
 [<img src="./samples/Capture7.png">]
@@ -59,11 +61,11 @@ If the Journal doesn't open, go to "Display" -> "Show" -> "Journal"
 
 [<img src="./samples/Capture13.PNG">]
 
-13. While saving select the "Excel Spreadsheet (.xls)" in "Save as type" and name the file same as the text file, "sample.xls" in our case. Click on "Save"
+13. While saving select the "Excel Spreadsheet (.xls)" in "Save as type" and name the file same as the text file, "EDA_Events.xls" in our case. Click on "Save"
 
 [<img src="./samples/Capture14.png">]
 
-14. Now you would have the two generated files named "sample.txt" and "sample.xls"
+14. Now you would have the two generated files named "EDA_Events.txt" and "EDA_Events.xls"
 
 [<img src="./samples/Capture15.PNG">]
 
@@ -89,21 +91,34 @@ Capture
 
 6. Once the application opens, click on "File" -> "Open". Browse the path where both text file and .xls file have been stored which were extracted from the Acknowledge 5.0. Click on the text file to open.
 
-7. For our demonstration, we will be using "sample.xls" and "sample.txt" generated which are placed under the "data" folder.
+[<img src="./samples/Sample2.png">]
+
+7. For our demonstration, we will be using "EDA_Events.xls" and "EDA_Events.txt" generated which are placed under the "data" folder.
 
 7. The footer of the application would turn from "No file selected" to the file location and the events list would be populated once the data has been successfully loaded.
 
+[<img src="./samples/Sample3.png">]
 
 ## Features of the Application 
 
 1. Plot whole data with event markers - The whole of data can be plotted and analyzed by clicking on the "Plot Data" button. The graph titled "Original Data Graph with Event Markers" will be plotted. The various utility tools like zooming and navigating are placed above the same graph.
 
+[<img src="./samples/Sample4.png">]
+
 2. Filtered Data - Two filters have been provided namely "High Low Pass Filter" and "Time Filter". Two input boxes are given to provide the threshold for the filters and checkboxes to select which filters to use while visualization. Tick the appropriate filter and enter the threshold in the following manner - 
 
 After this, click on "Apply Filters" button and the "Filtered Data Graph" will be populated with the filtered data.
 
+[<img src="./samples/Sample5.png">]
+
 3. Events list - The events list contains the list of events with their names for reference.
+
+[<img src="./samples/Sample6.png">]
 
 4. Multiple Event Graph - Multiple events can be superimposed and plotted on the same graph for analysis between events. Tick the required events in the Events list and click on "Plot Selected Events". Doing so would plot each selected event for 3000 msec on the "Multiple Events Graph" plot.
 
+[<img src="./samples/Sample7.png">]
+
 5. Analyze Single Events - Click on "Analyze Single Events" button, this will open another window titled "Single Event Analysis". However many windows can be opened. These windows are created to isolately analyze an event. Enter the event number in the input box provided (refer the Events list), and select the msec left and right cutoff to dispay the graph of the event. After selecting these parameters, click on "Plot event". The various utility tools like zooming and navigating are placed above the same graph.
+
+[<img src="./samples/Sample8.png">]
