@@ -9,11 +9,15 @@ from tkinter import filedialog
 from matplotlib.ticker import FormatStrFormatter
 import tkinter.scrolledtext as scrolledtext
 import customtkinter
+import os
+from tkinter import messagebox
+from matplotlib.figure import Figure
 parsed_data = []
 indexes = []
 events = []
 list_var = []
 events_names = []
+events_parsed, file_loaded = False, False
 
 class VerticalScrolledFrame(tk.Frame):
     def __init__(self, parent, *args, **kw):
@@ -54,10 +58,17 @@ class VerticalScrolledFrame(tk.Frame):
         canvas.bind('<Configure>', _configure_canvas)
 
 filename = ""
+
+def error_box(message):
+    messagebox.showerror('Error', message)
+
 def parse_data(text_events):
     global filename, parsed_data, indexes, events, list_var, events_names
     # file = os.listdir(file_path)
     events_file = filename.split('.')[0] + '.xls'
+    if not os.path.exists(events_file):
+        error_box('Excel Events file does not exist in the same path as text file')
+        return [], [], []
     print(events_file)
     dataframe = pd.read_excel(events_file, engine='xlrd')
     print(dataframe[2:-1])
@@ -188,7 +199,7 @@ def insert_check_button_event(num_events, text_events, events, events_names):
     global list_var
     for r in range(num_events):
         var = tk.IntVar()
-        check_ = tk.Checkbutton(text_events, text=f'Event - {r} - {events_names[r]}', variable=var, bd=4, font='Helvetica', bg='white')
+        check_ = tk.Checkbutton(text_events, text=f'Event - {r} - {events_names[r]}', variable=var, bd=4, font=('Helvetica', 10), bg='white')
         list_var.append(var)
         text_events.window_create('end', window=check_)
         text_events.insert('end', '\n')
@@ -254,9 +265,14 @@ def create_events_window(root):
     window = tk.Toplevel(root)
     window.title('Single Event Analysis')
 
-    fig, ax = plt.subplots()
+    fig = Figure(figsize=(5, 4), dpi=90)
+    ax = fig.add_subplot(111)
     ax.set_xlabel('Time (msec)')
     ax.set_ylabel('Value')
+
+    # fig, ax = plt.subplots()
+    # ax.set_xlabel('Time (msec)')
+    # ax.set_ylabel('Value')
 
     frame = tk.Frame(window)
 
@@ -305,18 +321,29 @@ def main():
 
     frame = tk.Frame(root)
 
-    fig, ax = plt.subplots()
+    fig = Figure(figsize=(5, 4), dpi=90)
+    ax = fig.add_subplot(111)
     ax.set_title('Original Data Graph with Event Markers')
     ax.set_xlabel('Time (msec)')
     ax.set_ylabel('Value')
+    # fig, ax = plt.subplots()
+    # ax.set_title('Original Data Graph with Event Markers')
+    # ax.set_xlabel('Time (msec)')
+    # ax.set_ylabel('Value')
 
     canvas = FigureCanvasTkAgg(fig, master=frame)
     canvas.get_tk_widget().grid(row=1, column=0)
 
-    fig2, ax2 = plt.subplots()
+
+    fig2 = Figure(figsize=(5, 4), dpi=90)
+    ax2 = fig2.add_subplot(111)
     ax2.set_title('Filtered Data Graph')
     ax2.set_xlabel('Index')
     ax2.set_ylabel('Value')
+    # fig2, ax2 = plt.subplots()
+    # ax2.set_title('Filtered Data Graph')
+    # ax2.set_xlabel('Index')
+    # ax2.set_ylabel('Value')
 
     canvas2 = FigureCanvasTkAgg(fig2, master=frame)
     canvas2.get_tk_widget().grid(row=1, column=1, columnspan=3)
@@ -351,7 +378,7 @@ def main():
     label.config(font=('Helvetica', 15))
     label.grid(row=0, column=0)
 
-    scroll_text = scrolledtext.ScrolledText(frame_events, height=30, width=70)
+    scroll_text = scrolledtext.ScrolledText(frame_events, height=20, width=50)
     scroll_text.grid(row=1, column=0, padx=5)
 
     # Toolbar
@@ -365,11 +392,16 @@ def main():
     root.config(menu=menu)
 
     # Multiple Events plot
-    fig3, ax3 = plt.subplots()
 
+    fig3 = Figure(figsize=(5, 4), dpi=90)
+    ax3 = fig3.add_subplot(111)
     ax3.set_title('Multiple Events Graph')
-    ax3.set_xlabel('Time (msec)')
+    ax3.set_xlabel('Index')
     ax3.set_ylabel('Value')
+    # fig3, ax3 = plt.subplots()
+    # ax3.set_title('Multiple Events Graph')
+    # ax3.set_xlabel('Time (msec)')
+    # ax3.set_ylabel('Value')
 
     canvas3 = FigureCanvasTkAgg(fig3, master=frame_events)
     canvas3.get_tk_widget().grid(row=1, column=1)
@@ -379,7 +411,7 @@ def main():
     # entry_events_thresh.grid(row=2, column=1)
 
     tk.Button(frame_events, text='Plot Selected Events', command=lambda: plot_events(fig3, ax3, canvas3)).grid(row=2, column=0)
-    tk.Button(frame_events, text='Analyze Single Events', command=lambda: create_events_window(root)).grid(row=3, column=0, pady=10)
+    tk.Button(frame_events, text='Analyze Single Events', command=lambda: create_events_window(root)).grid(row=3, column=0, pady=5)
 
     # Footer
     var = tk.StringVar()

@@ -6,9 +6,14 @@ A tool to analyse the EDA data captured using BIOPAC and Acknowledge 5.0 with th
 
 ## Requirements - 
   Window 11 
+
   Python 3.11.9
+  
   BIOPAC
+  
   Acknowledge 5.0
+  
+  Resolution compatible - 1920x1080
 
 
 ## On the Acknowledge 5.0 - 
@@ -99,8 +104,7 @@ microsiemens
 2. Activate the python package installer pip, if not done already.
 
 3. Open the terminal and execute the following command to install the required python packages - 
-  
-    pip install matplotlib tk numpy scipy pandas customtkinter xlrd
+  pip install matplotlib tk numpy scipy pandas customtkinter
 
 4. In the terminal, go to the folder where the code is kept.
 
