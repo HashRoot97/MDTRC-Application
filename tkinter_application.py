@@ -11,13 +11,17 @@ import tkinter.scrolledtext as scrolledtext
 import customtkinter
 import os
 from tkinter import messagebox
+from tkinter import ttk
 from matplotlib.figure import Figure
+
+# Global variables
 parsed_data = []
 indexes = []
 events = []
 list_var = []
 events_names = []
 events_parsed, file_loaded = False, False
+filename = ""
 
 class VerticalScrolledFrame(tk.Frame):
     def __init__(self, parent, *args, **kw):
@@ -57,7 +61,6 @@ class VerticalScrolledFrame(tk.Frame):
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
         canvas.bind('<Configure>', _configure_canvas)
 
-filename = ""
 
 def error_box(message):
     messagebox.showerror('Error', message)
@@ -69,11 +72,15 @@ def parse_data(text_events):
     if not os.path.exists(events_file):
         error_box('Excel Events file does not exist in the same path as text file')
         return [], [], []
-    print(events_file)
+    # print(events_file)
     dataframe = pd.read_excel(events_file, engine='xlrd')
-    print(dataframe[2:-1])
-    events = np.asarray(dataframe[2:-1]['Unnamed: 1'])
-    events_names = np.asarray(dataframe[2:-1]['Unnamed: 4'])
+    # print(dataframe[2:-1])
+    try:
+        events = np.asarray(dataframe[2:-1]['Unnamed: 1'])
+        events_names = np.asarray(dataframe[2:-1]['Unnamed: 4'])
+    except:
+        error_box('Error in parsing the excel file. Incorrect format')
+        return [], [], []
     parsed_events = []
     # exit()
     for ev in events:
@@ -87,6 +94,9 @@ def parse_data(text_events):
     with open(filename, 'r') as f:
         lines = f.readlines()
     lines = [line[:-1] for line in lines]
+    if not lines[7] == 'min	CH2	CH13	CH14	':
+        error_box('Error in parsing the text file. Incorrect format')
+        return [], [], []
     lines = lines[10:]
     parsed_data = []
     indexes = []
@@ -206,7 +216,6 @@ def insert_check_button_event(num_events, text_events, events, events_names):
     print(events)
     text_events.config(state = "disabled")
 
-
 def plot_events(fig3, ax3, canvas3):
     global list_var, parsed_data, events
     # threshold = entry.get()
@@ -233,7 +242,7 @@ def plot_events(fig3, ax3, canvas3):
         canvas3.draw()
 
 
-def plot_single_event(entry_event, ax, canvas, slider, slider2, var):
+def plot_single_event(entry_event, ax, canvas, slider, slider2, var, min_data, max_data):
 
     left_cutoff = int(slider.get())
     right_cutoff = int(slider2.get())
@@ -257,6 +266,8 @@ def plot_single_event(entry_event, ax, canvas, slider, slider2, var):
     ax.set_ylabel('Value')
     ax.axvline(x=event)
     ax.plot(indexes[0], data[0])
+    min_data.set(str(np.min(data[0])))
+    max_data.set(str(np.max(data[0])))
     canvas.draw()
 
     var.set('Events Title : ' + events_names[event_id])
@@ -269,10 +280,6 @@ def create_events_window(root):
     ax = fig.add_subplot(111)
     ax.set_xlabel('Time (msec)')
     ax.set_ylabel('Value')
-
-    # fig, ax = plt.subplots()
-    # ax.set_xlabel('Time (msec)')
-    # ax.set_ylabel('Value')
 
     frame = tk.Frame(window)
 
@@ -310,7 +317,20 @@ def create_events_window(root):
     slider_label2.grid(row=6, column=1)
     slider2.bind('<ButtonRelease-1>', command=lambda a:[slider_label2.configure(text=int(slider2.get()))])
 
-    tk.Button(frame, text='Plot Event', command=lambda: plot_single_event(entry_event, ax, canvas, slider, slider2, var)).grid(row=7, column=1)
+    min_data = tk.StringVar()
+    min_data.set("-")
+    max_data = tk.StringVar()
+    max_data.set("-")
+    tk.Button(frame, text='Plot Event', command=lambda: plot_single_event(entry_event, ax, canvas, slider, slider2, var, min_data, max_data)).grid(row=7, column=1)
+
+    tk.Label(frame, text='Absolute Minimum : ').grid(row=8, column=0)
+    tk.Label(frame, text='Absolute Maximum : ').grid(row=8, column=1)
+
+    abs_min = tk.Label(frame, textvariable=min_data)
+    abs_max = tk.Label(frame, textvariable=max_data)
+
+    abs_min.grid(row=9, column=0)
+    abs_max.grid(row=9, column=1)
     frame.grid()
 
 def main():
@@ -326,10 +346,6 @@ def main():
     ax.set_title('Original Data Graph with Event Markers')
     ax.set_xlabel('Time (msec)')
     ax.set_ylabel('Value')
-    # fig, ax = plt.subplots()
-    # ax.set_title('Original Data Graph with Event Markers')
-    # ax.set_xlabel('Time (msec)')
-    # ax.set_ylabel('Value')
 
     canvas = FigureCanvasTkAgg(fig, master=frame)
     canvas.get_tk_widget().grid(row=1, column=0)
@@ -340,10 +356,6 @@ def main():
     ax2.set_title('Filtered Data Graph')
     ax2.set_xlabel('Index')
     ax2.set_ylabel('Value')
-    # fig2, ax2 = plt.subplots()
-    # ax2.set_title('Filtered Data Graph')
-    # ax2.set_xlabel('Index')
-    # ax2.set_ylabel('Value')
 
     canvas2 = FigureCanvasTkAgg(fig2, master=frame)
     canvas2.get_tk_widget().grid(row=1, column=1, columnspan=3)
@@ -398,17 +410,9 @@ def main():
     ax3.set_title('Multiple Events Graph')
     ax3.set_xlabel('Index')
     ax3.set_ylabel('Value')
-    # fig3, ax3 = plt.subplots()
-    # ax3.set_title('Multiple Events Graph')
-    # ax3.set_xlabel('Time (msec)')
-    # ax3.set_ylabel('Value')
 
     canvas3 = FigureCanvasTkAgg(fig3, master=frame_events)
     canvas3.get_tk_widget().grid(row=1, column=1)
-
-    # entry_events_thresh = tk.Entry(frame_events, width= 40)
-    # entry_events_thresh.focus_set()
-    # entry_events_thresh.grid(row=2, column=1)
 
     tk.Button(frame_events, text='Plot Selected Events', command=lambda: plot_events(fig3, ax3, canvas3)).grid(row=2, column=0)
     tk.Button(frame_events, text='Analyze Single Events', command=lambda: create_events_window(root)).grid(row=3, column=0, pady=5)
@@ -421,9 +425,9 @@ def main():
 
     frame.grid(row=1, column=0) 
     frame_events.grid(row=3, column=0)
-    # frame_single.grid(row=1, column=1)
 
     root.mainloop()
+
 
     # Single Events Analysis
 
@@ -493,35 +497,34 @@ def main():
 
     # frame_top.grid(row=0, column=0)
 
-
 if __name__ == "__main__":
     main()
 
-def get_multiple_graphs_again(frame_graphs, num_graphs, data, indexes):
+# def get_multiple_graphs_again(frame_graphs, num_graphs, data, indexes):
 
-    fig, axes = plt.subplots(num_graphs, 1,sharex=True,figsize=(5, 80))
+#     fig, axes = plt.subplots(num_graphs, 1,sharex=True,figsize=(5, 80))
 
-    for k in range(num_graphs):  
-        axes[k].plot(indexes[k], data[k])
+#     for k in range(num_graphs):  
+#         axes[k].plot(indexes[k], data[k])
         
-    canvas = FigureCanvasTkAgg(fig, master=frame_graphs.interior)
-    canvas.draw()
-    canvas.get_tk_widget().grid(row=0, column=0)
+#     canvas = FigureCanvasTkAgg(fig, master=frame_graphs.interior)
+#     canvas.draw()
+#     canvas.get_tk_widget().grid(row=0, column=0)
 
 
-def get_multiple_graphs(frame_graphs, num_graphs, data):
+# def get_multiple_graphs(frame_graphs, num_graphs, data):
 
-    fig, axes = plt.subplots(5, 1,sharex=True,figsize=(5, 80))
+#     fig, axes = plt.subplots(5, 1,sharex=True,figsize=(5, 80))
 
-    t=np.linspace(0,1,1000)
+#     t=np.linspace(0,1,1000)
 
-    for k in range(5):  
+#     for k in range(5):  
         
-        axes[k].plot(t,np.sin(2*np.pi*t*k))
+#         axes[k].plot(t,np.sin(2*np.pi*t*k))
         
-    canvas = FigureCanvasTkAgg(fig, master=frame_graphs.interior)
-    canvas.draw()
-    canvas.get_tk_widget().grid(row=0, column=0)
+#     canvas = FigureCanvasTkAgg(fig, master=frame_graphs.interior)
+#     canvas.draw()
+#     canvas.get_tk_widget().grid(row=0, column=0)
 
 
     # scroll_bar_events = tk.Scrollbar(frame_graphs)
