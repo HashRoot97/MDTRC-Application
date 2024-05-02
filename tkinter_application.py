@@ -219,10 +219,13 @@ def insert_check_button_event(num_events, text_events, events, events_names):
 def plot_events(fig3, ax3, canvas3):
     global list_var, parsed_data, events
     # threshold = entry.get()
-    threshold = 2000
+    threshold = 5000
     ind = 0
     data = []
     indexes = []
+    if events == []:
+        error_box('No events in the list, load the data files first')
+        return
     for val in list_var:
         # print('Status of event : ', val.get())
         event = events[ind]
@@ -251,11 +254,18 @@ def plot_single_event(entry_event, ax, canvas, slider, slider2, var, min_data, m
 
     global list_var, parsed_data, events, events_names
     event_id = entry_event.get()
+    if event_id == '':
+        error_box('Enter a valid event number')
+        return
     event_id = int(event_id)
     ind = 0
     data = []
     indexes = []
-    event = events[event_id]
+    try:
+        event = events[event_id]
+    except:
+        error_box('Enter a valid event number')
+        return
     indexes.append([i for i in range(event-left_cutoff, event+right_cutoff)])
     data.append(parsed_data[event-left_cutoff:event+right_cutoff])
     print('Amount of events to be plotted : ', len(data))
