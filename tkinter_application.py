@@ -61,6 +61,26 @@ class VerticalScrolledFrame(tk.Frame):
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
         canvas.bind('<Configure>', _configure_canvas)
 
+def parse_respiration():
+    global filename, parsed_data, indexes
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+    lines = [line[:-1] for line in lines]
+    # if not lines[7] == 'min	CH2	CH13	CH14	':
+    #     error_box('Error in parsing the text file. Incorrect format')
+    #     return [], [], []
+    lines = lines[10:]
+    parsed_data = []
+    indexes = []
+    index = 0
+    for line in lines:
+        indexes.append(index)
+        parsed_data.append(float(line.split('\t')[1]))
+        index += 0.5
+    parsed_data = np.asarray(parsed_data, dtype=np.float32)
+    indexes = np.asarray(indexes, dtype=np.int32)
+    return parsed_data, indexes, []
+
 
 def error_box(message):
     messagebox.showerror('Error', message)
@@ -204,6 +224,7 @@ def browse_file(text_events, var):
     print(filename)
     var.set(filename)
     parsed_data, indexes, events = parse_data(text_events)
+    # parsed_data, indexes, events = parse_respiration()
 
 def insert_check_button_event(num_events, text_events, events, events_names):
     global list_var
@@ -223,9 +244,9 @@ def plot_events(fig3, ax3, canvas3):
     ind = 0
     data = []
     indexes = []
-    if events == []:
-        error_box('No events in the list, load the data files first')
-        return
+    # if events == []:
+    #     error_box('No events in the list, load the data files first')
+    #     return
     for val in list_var:
         # print('Status of event : ', val.get())
         event = events[ind]
