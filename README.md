@@ -111,7 +111,7 @@ microsiemens
 5. Run the following command to run the application - 
   python tkinter_application.py
 
-6. Once the application opens, click on "File" -> "Open". Browse the path where both text file and .xls file have been stored which were extracted from the Acknowledge 5.0. Click on the text file to open.
+6. Once the application opens, click on "Open File". Browse the path where both text file and .xls file have been stored which were extracted from the Acknowledge 5.0. Click on the text file to open.
 
 <img src="./samples/Sample2.png">
 
@@ -127,11 +127,11 @@ microsiemens
 
 <img src="./samples/Sample4.png">
 
-2. Filtered Data - Two filters have been provided namely "High Low Pass Filter" and "Time Filter". Two input boxes are given to provide the threshold for the filters and checkboxes to select which filters to use while visualization. Tick the appropriate filter and enter the threshold in the following manner - 
+2. Filtered Data - Two filters have been provided namely "Gaussian Filter" and "Time Filter". The input to the gaussian filter is the sigma for the filter, example - 40 (sigma - 40). The input to the "Time Filter" is the from and to time stamp in msec seperated by a comma, example - 0,100000 (for time stamp between 0msec and 100000msec) Tick the appropriate filter and enter the threshold in the following manner - 
 
 After this, click on "Apply Filters" button and the "Filtered Data Graph" will be populated with the filtered data.
 
-<img src="./samples/Sample5.png">
+<img src="./samples/Sample53.png">
 
 3. Events list - The events list contains the list of events with their names for reference.
 
@@ -141,6 +141,10 @@ After this, click on "Apply Filters" button and the "Filtered Data Graph" will b
 
 <img src="./samples/Sample7.png">
 
-5. Analyze Single Events - Click on "Analyze Single Events" button, this will open another window titled "Single Event Analysis". However many windows can be opened. These windows are created to isolately analyze an event. Enter the event number in the input box provided (refer the Events list), and select the msec left and right cutoff to dispay the graph of the event. After selecting these parameters, click on "Plot event". The various utility tools like zooming and navigating are placed above the same graph.
+5. Single Event Analyzer - Single Event Analyzer is used to analyze islotaed events and display and dump statistics about it. It can also apply various filters like moving average filter and Gaussian filter to the input signal . Enter the event number in the "Event number" input box provided (refer the Events list), and select the msec left and right cutoff to dispay the graph of the event. The maximum seek for the left and right part is 10,000 msec. Additionally to display the filtered signals as well, use the checkboxes for the moving average filter and Gaussian filter accordingly. The input to moving average filter needs to be provided as the window size of the moving average, example - 100 (for moving average of 100 msec). The input to gaussian filter needs to be provided as the sigma for the filtering, example - 40 (for sigma = 40). After selecting these parameters, click on "Plot Event & Analyze". The appropriate signals will be plotted.
 
-<img src="./samples/Sample8.png">
+<img src="./samples/Sample51.png">
+
+6. Analyzer Journal - This feature can be used to dump the statistics into a text file for a single event analysis. After clicking the "Plot Event & Analysis" from the Single Event Analyzer, the user can click on "Add to Journal". This button would add the current selected events analysis parameters like "Absolute minimum" and "Absolute maximum" to the Journal text box. After the journal entry has been added, the user can dump the journal into a text file. Use the button "Dump Journal to File" for doing so.
+
+<img src="./samples/Sample52.png">
