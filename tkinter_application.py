@@ -162,14 +162,15 @@ def plot_data_resp(ax, canvas, indexes_resp, parsed_data_resp):
     canvas.draw()
 
 def apply_high_low(data, entry_from, indexes):
-    filt = entry_from.get()
-    en_from, en_to = filt.split(",")
-    en_from, en_to = float(en_from), float(en_to)
-    new_data = data[data>en_from]
-    new_data = new_data[new_data<en_to]
-    new_indexes = np.asarray([i for i in range(len(new_data))])
+    filt = int(entry_from.get())
+    # en_from, en_to = filt.split(",")
+    # en_from, en_to = float(en_from), float(en_to)
+    # new_data = data[data>en_from]
+    # new_data = new_data[new_data<en_to]
+    # new_indexes = np.asarray([i for i in range(len(new_data))])
+    new_data = gaussian_filter1d(data, filt)
 
-    return new_data, new_indexes
+    return new_data, indexes
 
 def apply_gaus(data, entry_from, indexes):
     filt = entry_from.get()
@@ -290,8 +291,15 @@ def plot_events(fig3, ax3, canvas3):
         ax3.plot(new_indexes, data[i])
         canvas3.draw()
 
-def plot_single_event(entry_event, ax, canvas, slider, slider2, var, min_data, max_data, avg_data, med_data):
+def running_mean(x, N):
+    cumsum = np.cumsum(np.insert(x, 0, 0)) 
+    indexes = np.asarray([np.average(x[x.shape[0]-N:x.shape[0]]) for i in range(N-1)])
+    out = (cumsum[N:] - cumsum[:-N]) / float(N)
+    return np.concatenate((out, indexes))
 
+def plot_single_event(entry_event, ax, canvas, slider, slider2, var, min_data, max_data, avg_data, med_data, var3, var4, entry_c3, entry_c4):
+
+    ax.clear()
     left_cutoff = int(slider.get())
     right_cutoff = int(slider2.get())
 
@@ -322,14 +330,27 @@ def plot_single_event(entry_event, ax, canvas, slider, slider2, var, min_data, m
     ax.set_xlabel('Time (msec)')
     ax.set_ylabel('Value')
     ax.axvline(x=event)
-    ax.plot(indexes[0], data[0])
+    ax.plot(indexes[0], data[0], label='Event Data')
+    if var4.get() == 1:
+        print('Applying single event filter')
+        sigma_c4 = int(entry_c4.get())
+        gaus = gaussian_filter1d(data[0], sigma_c4)
+        ax.plot(indexes[0], gaus, label='Gaussian Filtered')
+    if var3.get() == 1:
+        print('Applying single event moving filter')
+        N = int(entry_c3.get())
+        rmean = running_mean(data[0], N)
+        ax.plot(indexes[0], rmean, label='Running mean')
+    # print(np.min(data[0]), np.max(data[0]))
+    ax.set_ylim(np.min(data[0]), np.max(data[0]))   
     min_data.set(str(np.min(data[0])))
     max_data.set(str(np.max(data[0])))
     avg_data.set(str(np.average(data_before[0])))
     med_data.set(str(np.median(data_before[0])))
+    ax.legend(loc="upper left", )
     canvas.draw()
 
-    var.set('Title : ' + events_names[event_id])
+    var.set('Title : ' + events_names[event_id] + '(' + str(event_id) + ')')
 
 def browse_file_resp(var):
     global filename_resp, parsed_data_resp, indexes_resp, events_resp
@@ -338,6 +359,25 @@ def browse_file_resp(var):
     var.set(filename_resp)
     parsed_data_resp, indexes_resp, events_resp = parse_respiration()
 
+def add_journal(text_journal, min_data, max_data, avg_data, med_data, var_title, left, right):
+    # var = tk.IntVar()
+    # lab1 = tk.Label(text_journal, text=var_title.get())
+    text_journal.configure(state="normal")
+    text_journal.insert(tk.INSERT, var_title.get() + '\n')
+    text_journal.insert(tk.INSERT, str(left.cget("text")) + ' ms - ' + str(right.cget("text")) + 'ms\n')
+    text_journal.insert(tk.INSERT, 'Absolute Minimum - ' + min_data.get() + '\n')
+    text_journal.insert(tk.INSERT, 'Absolute Maximum - ' + max_data.get() + '\n')
+    text_journal.insert(tk.INSERT, 'Baseline Average - ' + avg_data.get() + '\n')
+    text_journal.insert(tk.INSERT, 'Baseline Median - ' + med_data.get() + '\n\n')
+    # text_journal.configure(state="disabled")
+
+def dump_journal(text_journal):
+    cur_inp = text_journal.get("1.0", tk.END)
+    # print(cur_inp)
+    save_dir = filedialog.askdirectory()
+    with open(os.path.join(save_dir, 'events_journal.txt'), 'w') as f:
+        f.write(cur_inp)
+ 
 def main():
 
     root = tk.Tk()
@@ -352,10 +392,12 @@ def main():
 
     frame = ttk.Frame(tabControl)
     frame_resp = ttk.Frame(tabControl)
+    frame_heart = ttk.Frame(tabControl)
 
     tabControl.add(frame, text='  EDA - Skin Conductance  ', padding='0.1i')
-    tabControl.add(frame_resp, text='  Respiration  ', padding='0.1i', )
-
+    tabControl.add(frame_resp, text='  Respiration  ', padding='0.1i')
+    tabControl.add(frame_heart, text='  Heart Rate  ', padding='0.1i')
+   
     tabControl.grid(row=0, column=0)
 
     scroll_text = scrolledtext.ScrolledText(frame, height=20, width=50)
@@ -408,18 +450,18 @@ def main():
     tk.Button(frame, text='Plot Data', command=lambda: plot_data(ax, canvas, indexes, parsed_data)).grid(row=3, column=0, padx=0, pady=5)
     entry_high_low= tk.Entry(frame, width= 40)
     entry_high_low.focus_set()
-    entry_high_low.grid(row=3, column=1)
+    entry_high_low.grid(row=3, column=2)
 
     entry_time= tk.Entry(frame, width= 40)
     entry_time.focus_set()
-    entry_time.grid(row=4, column=1)
+    entry_time.grid(row=4, column=2)
 
     var1 = tk.IntVar()
     var2 = tk.IntVar()
     c1 = tk.Checkbutton(frame, text='Gaussian Filter',variable=var1, onvalue=1, offvalue=0)
-    c1.grid(row=3, column=2, pady=2)
+    c1.grid(row=3, column=1, pady=2)
     c2 = tk.Checkbutton(frame, text='Time Filter',variable=var2, onvalue=1, offvalue=0)
-    c2.grid(row=4, column=2, pady=2)
+    c2.grid(row=4, column=1, pady=2)
 
     tk.Button(frame, text='Apply Filters', command=lambda: apply_filters(fig2, ax2, canvas2, entry_high_low, entry_time, var1, var2)).grid(row=5, column=1, pady=5)
 
@@ -478,7 +520,7 @@ def main():
 
     tk.Label(frame, text="Left Cutoff").grid(row=6, column=4)
 
-    slider = customtkinter.CTkSlider(frame, from_=0, to=5000)
+    slider = customtkinter.CTkSlider(frame, from_=0, to=10000)
     slider.grid(row=7, column=4)
     slider_label = customtkinter.CTkLabel(frame, text=slider.get())
     slider_label.grid(row=8, column=4)
@@ -486,7 +528,7 @@ def main():
 
     tk.Label(frame, text="Right Cutoff").grid(row=6, column=5)
 
-    slider2 = customtkinter.CTkSlider(frame, from_=0, to=5000)
+    slider2 = customtkinter.CTkSlider(frame, from_=0, to=10000)
     slider2.grid(row=7, column=5)
     slider_label2 = customtkinter.CTkLabel(frame, text=slider2.get())
     slider_label2.grid(row=8, column=5)
@@ -497,41 +539,55 @@ def main():
     max_data = tk.StringVar()
     max_data.set("-")
 
-    tk.Label(frame, text='Absolute Minimum : ').grid(row=10, column=4)
-    tk.Label(frame, text='Absolute Maximum : ').grid(row=10, column=5)
+    tk.Label(frame, text='Absolute Minimum : ').grid(row=9, column=4)
+    tk.Label(frame, text='Absolute Maximum : ').grid(row=9, column=5)
 
     abs_min = tk.Label(frame, textvariable=min_data)
     abs_max = tk.Label(frame, textvariable=max_data)
 
-    abs_min.grid(row=11, column=4)
-    abs_max.grid(row=11, column=5)
+    abs_min.grid(row=10, column=4)
+    abs_max.grid(row=10, column=5)
 
     avg_data = tk.StringVar()
     avg_data.set("-")
     med_data = tk.StringVar()
     med_data.set("-")
 
-    tk.Label(frame, text='Baseline Average : ').grid(row=12, column=4)
-    tk.Label(frame, text='Baseline Median : ').grid(row=12, column=5)
+    tk.Label(frame, text='Baseline Average : ').grid(row=11, column=4)
+    tk.Label(frame, text='Baseline Median : ').grid(row=11, column=5)
 
     base_avg = tk.Label(frame, textvariable=avg_data)
     base_med = tk.Label(frame, textvariable=med_data)
 
-    base_avg.grid(row=13, column=4)
-    base_med.grid(row=13, column=5)
-
-    tk.Button(frame, text='Plot Event', command=lambda: plot_single_event(entry_event, ax_s, canvas_s, slider, slider2, var_title, min_data, max_data, avg_data, med_data)).grid(row=9, column=5)
+    base_avg.grid(row=12, column=4)
+    base_med.grid(row=12, column=5)
 
     var3 = tk.IntVar()
     var4 = tk.IntVar()
     c3 = tk.Checkbutton(frame, text='Moving Average Filter',variable=var3, onvalue=1, offvalue=0)
-    c3.grid(row=14, column=4, pady=2)
-    c4 = tk.Checkbutton(frame, text='Band pass Filter',variable=var4, onvalue=1, offvalue=0)
-    c4.grid(row=15, column=4, pady=2)
+    c3.grid(row=13, column=4, pady=2)
+    entry_c3= tk.Entry(frame, width= 40)
+    entry_c3.focus_set()
+    entry_c3.grid(row=13, column=5)
 
-    tk.Button(frame, text='Apply Filters').grid(row=16, column=5, pady=5)
+    c4 = tk.Checkbutton(frame, text='Gaussian Filter',variable=var4, onvalue=1, offvalue=0)
+    c4.grid(row=14, column=4, pady=2)
+    entry_c4= tk.Entry(frame, width= 40)
+    entry_c4.focus_set()
+    entry_c4.grid(row=14, column=5)
 
-    tk.Button(frame, text='Dump Statistics for Event').grid(row=17, column=5, padx=0, pady=5)
+    tk.Button(frame, text='Plot Event & Analyze', command=lambda: plot_single_event(entry_event, ax_s, canvas_s, slider, slider2, var_title, min_data, max_data, avg_data, med_data, var3, var4, entry_c3, entry_c4)).grid(row=15, column=4)
+    tk.Button(frame, text='Add to Journal', command=lambda: add_journal(scroll_text_journal, min_data, max_data, avg_data, med_data, var_title, slider_label, slider_label2)).grid(row=15, column=5, padx=0, pady=5)
+
+    scroll_text_journal = scrolledtext.ScrolledText(frame, height=40, width=60)
+    scroll_text_journal.grid(row=2, column=7, padx=5, rowspan=12)
+
+    tk.Button(frame, text='Dump Journal to File', command=lambda: dump_journal(scroll_text_journal)).grid(row=15, column=7)
+
+    label_eaj = tk.Label(frame, text='Analyzer Journal')
+    label_eaj.grid(row=0, column=7)
+    label_eaj.config(font=('Helvetica', 16))
+
     root.mainloop()
 
     # Toolbar
