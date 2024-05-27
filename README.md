@@ -117,9 +117,7 @@ microsiemens
 
 7. For our demonstration, we will be using "EDA_Events.xls" and "EDA_Events.txt" generated which are placed under the "data" folder.
 
-7. The footer of the application would turn from "No file selected" to the file location and the events list would be populated once the data has been successfully loaded.
-
-<img src="./samples/Sample3.png">
+8. The "No File Selected" label would be updated to File location and the events list would be populated once the data has been successfully loaded.
 
 ## Features of the Application 
 
